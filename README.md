@@ -29,14 +29,14 @@ Before conducting the main analysis, the data undergoes preparation steps, inclu
 -- Preparation steps
 
 -- Adding a new date column without showing the time, in all the tables. Eg.,
-
--- ALTER TABLE PortfolioProject..HDFCBANK
+ALTER TABLE PortfolioProject..HDFCBANK
 ADD New_Date nvarchar(400)
+
 UPDATE PortfolioProject..HDFCBANK
 SET New_Date = CONVERT(nvarchar(400), [Date], 23)
 
 -- Find the month with highest volume for each stock. Eg.,
--- SELECT TOP (1) Symbol, Year(New_Date) AS Year, Month(New_Date) AS Month, MAX(Volume) AS Max_Volume
+SELECT TOP (1) Symbol, Year(New_Date) AS Year, Month(New_Date) AS Month, MAX(Volume) AS Max_Volume
 FROM PortfolioProject..HDFCBANK
 GROUP BY Symbol, Year(New_Date), Month(New_Date)
 ORDER BY MAX(Volume) DESC;
@@ -50,7 +50,19 @@ Volatility is calculated as the average difference between the daily high and lo
 
 ```sql
 -- Volatility Comparison
--- Code for volatility analysis goes here...
+CREATE VIEW Volatility AS (SELECT Symbol, [High], [Low] FROM HDFCBANK
+UNION
+SELECT Symbol, [High], [Low] FROM ONGC
+UNION
+SELECT Symbol, [High], [Low] FROM TCS);
+
+SELECT * FROM Volatility
+
+SELECT Symbol, ROUND(AVG(High-Low), 2) AS Average_Volatility, DENSE_RANK() OVER(ORDER BY AVG(High-Low)) AS Ranking
+FROM Volatility
+GROUP BY Symbol;
+
+Result - ONGC is the least Volatile and TCS is the most Volatile
 ```
 
 ### Q2. Which stock fell the least during the Covid times? (Drawdown)
@@ -58,8 +70,20 @@ Volatility is calculated as the average difference between the daily high and lo
 Drawdown percentage during the COVID-19 period (February 20, 2020, to March 31, 2020) is calculated for each stock.
 
 ```sql
--- Drawdown Analysis
--- Code for drawdown analysis goes here...
+-- Drawdown Analysis. Eg.,
+DECLARE @pre_covid_price_hdfcbank float
+DECLARE @post_covid_price_hdfcbank float
+
+SET @pre_covid_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK 
+WHERE New_Date = '2020-02-20');
+
+SET @post_covid_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK
+WHERE New_Date = '2020-03-31');
+
+SELECT ROUND(((-@pre_covid_price_hdfcbank+@post_covid_price_hdfcbank)/@pre_covid_price_hdfcbank), 4) * 100
+  AS hdfcbank_drawdown;
+
+--The stock price of HDFC Bank fell by 29.18% during the COVID fall
 ```
 
 ### Q3. How many days did it take for the stock price to rise to its pre-Covid levels? (Recovery Days)
@@ -67,8 +91,26 @@ Drawdown percentage during the COVID-19 period (February 20, 2020, to March 31, 
 Recovery days represent the number of days it took for each stock's price to surpass its pre-COVID levels.
 
 ```sql
--- Recovery Days Calculation
--- Code for recovery days calculation goes here...
+-- Recovery Days Calculation. Eg.,
+DECLARE @pre_covid_price_hdfcbank float, @date_close_more_than_pre_covid_hdfcbank date;
+
+SET @pre_covid_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK 
+WHERE New_Date = '2020-02-20');
+
+SET @date_close_more_than_pre_covid_hdfcbank =
+	(SELECT New_Date FROM (
+		SELECT New_Date, [Close], ROW_NUMBER () OVER (ORDER BY New_Date) As rank_based_on_new_date 
+		FROM PortfolioProject..HDFCBANK
+		WHERE New_Date BETWEEN '2020-03-31' AND '2021-04-30' AND [Close] >= @pre_covid_price_hdfcbank
+	) AS A1
+WHERE rank_based_on_new_date = 1);
+
+SELECT @date_close_more_than_pre_covid_hdfcbank AS RECOVERY_DAYS
+
+SELECT DATEDIFF (day, '2020-03-31', @date_close_more_than_pre_covid_hdfcbank)
+ AS days_req_by_hdfcbank_stock_price_to_close_above_its_pre_covid_level;
+
+-- Number of days it took for HDFCBANK to close above the pre-covid close price level is 192 days
 ```
 
 ### Q4. Number of days the stock price closed above its previous day close price (Strength)
@@ -77,7 +119,24 @@ Strength of each stock is measured by the total number of days its price closed 
 
 ```sql
 -- Strength Measurement
--- Code for strength measurement goes here...
+CREATE VIEW Strength AS (
+	SELECT Symbol, New_Date, [Close] FROM PortfolioProject..HDFCBANK
+	 UNION
+	SELECT Symbol, New_Date, [Close] FROM PortfolioProject..ONGC
+	 UNION
+	SELECT Symbol, New_Date, [Close] FROM PortfolioProject..TCS);
+
+SELECT *
+FROM Strength
+
+SELECT Symbol, SUM(IIF(([CLOSE] > prev_day_cc), 1, 0)) AS number_of_days_close_is_above_prev_day_close, DENSE_RANK() OVER(ORDER BY
+ SUM(IIF(([CLOSE] > prev_day_cc), 1, 0)) DESC) AS [rank]
+FROM
+	(SELECT Symbol, New_Date, [Close], LAG([Close]) OVER(PARTITION BY Symbol ORDER BY New_Date) AS prev_day_cc
+	 FROM Strength) AS xyz
+GROUP BY Symbol;
+
+-- Total number of days when the stock price closed above its previous day closing price (to measure the strength of the stock): TCS	= 1448 days, HDFCBANK = 1441 days, ONGC = 1385 days
 ```
 
 ### Q5. CAGR Calculation
@@ -85,26 +144,41 @@ Strength of each stock is measured by the total number of days its price closed 
 Compound Annual Growth Rate (CAGR) is calculated to measure the annualized growth rate of each stock's price over the given time period.
 
 ```sql
--- CAGR Calculation
--- Code for CAGR calculation goes here...
+-- CAGR Calculation, Eg.,
+DECLARE @beginning_price_hdfcbank float, @ending_price_hdfcbank float, @no_of_years_hdfcbank float;
+
+SET @beginning_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK WHERE New_Date = '2010-01-04');
+SET @ending_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK WHERE New_Date = '2021-04-30');
+
+SET @no_of_years_hdfcbank = (SELECT ROUND (DATEDIFF (day, '2010-01-04', '2021-04-30') / 365, 3));
+
+SELECT ROUND((POWER((@ending_price_hdfcbank/@beginning_price_hdfcbank), 1/@no_of_years_hdfcbank) - 1) * 100, 4) AS HDFCBANK_CAGR;
+
+-- CAGR of HDFCBANK = -1.7013
+
 ```
 
 ## Final Score Calculation
 
 Based on the analysis conducted for each metric, a final score is calculated for each stock, considering predefined weightages for each metric.
 
-```sql
--- Final Score Calculation
--- Code for final score calculation goes here...
-```
-
 ## Final Score Table
 
 The final score table provides an overview of how each stock performs based on the analyzed metrics.
 
-```sql
--- Final Score Table
--- Code for generating the final score table goes here...
-```
+This SQL code is creating two tables, `Score_Table` and `Weightage_Table`, and then performing operations to calculate the final score for each symbol based on certain metrics and their corresponding weightages.
 
+1. The `Score_Table` is created with columns `Symbol`, `Description`, and `Score`. This table will hold the scores assigned to each symbol for different metrics such as volatility, drawdown, recovery, strength, and CAGR.
+
+2. The `Weightage_Table` is created with columns `Description` and `Weightage`. This table contains the weightages assigned to each metric.
+
+3. Next, data is inserted into both tables. For `Score_Table`, the scores for each symbol (`HDFCBANK`, `ONGC`, `TCS`) are assigned for each metric. For example, `HDFCBANK` has a score of 2 for volatility, lower drawdown, faster recovery, and CAGR, and a score of 2 for strength. Similarly, other symbols are assigned scores for each metric.
+
+4. The `Weightage_Table` is populated with weightages for each metric. Each metric is assigned a weightage of 0.2, meaning they contribute equally to the final score.
+
+5. Then, a SELECT statement is used to join `Score_Table` and `Weightage_Table` on the `Description` column to retrieve the scores and weightages for each symbol and metric.
+
+6. Finally, the final score for each symbol is calculated by multiplying the score for each metric by its corresponding weightage, summing up the products, and grouping the results by symbol. This gives the weighted sum of scores for each symbol, providing an overall assessment of their performance across the metrics. The symbols are ordered in descending order of their final scores.
+
+# Conclusion
 This readme file provides an overview of the analysis conducted on the stock market data for HDFC Bank, ONGC, and TCS, including the main analysis questions, preparation of data, and the calculation of final scores for each stock.
