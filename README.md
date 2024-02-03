@@ -1,4 +1,4 @@
-Portfolio Analysis Readme
+# Stock Analysis using SQL
 
 ## Table of Contents
 
@@ -26,7 +26,7 @@ The datasets for HDFC Bank, ONGC, and TCS cover the time period from April 1, 20
 Before conducting the main analysis, the data undergoes preparation steps, including adding a new date column without the time and finding the month with the highest volume for each stock.
 
 ```sql
--- Preparation steps (not included in Table of Contents)
+-- Preparation steps
 -- Code for data preparation goes here...
 ```
 
