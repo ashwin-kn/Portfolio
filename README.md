@@ -27,7 +27,19 @@ Before conducting the main analysis, the data undergoes preparation steps, inclu
 
 ```sql
 -- Preparation steps
--- Code for data preparation goes here...
+
+-- Adding a new date column without showing the time, in all the tables. Eg.,
+
+-- ALTER TABLE PortfolioProject..HDFCBANK
+ADD New_Date nvarchar(400)
+UPDATE PortfolioProject..HDFCBANK
+SET New_Date = CONVERT(nvarchar(400), [Date], 23)
+
+-- Find the month with highest volume for each stock. Eg.,
+-- SELECT TOP (1) Symbol, Year(New_Date) AS Year, Month(New_Date) AS Month, MAX(Volume) AS Max_Volume
+FROM PortfolioProject..HDFCBANK
+GROUP BY Symbol, Year(New_Date), Month(New_Date)
+ORDER BY MAX(Volume) DESC;
 ```
 
 ## Main Analysis
