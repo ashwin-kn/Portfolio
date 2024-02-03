@@ -48,26 +48,26 @@ ORDER BY MAX(Volume) DESC;
 
 Volatility is calculated as the average difference between the daily high and low prices for each stock.
 
-```sql
--- Volatility Comparison
-CREATE VIEW Volatility AS (SELECT Symbol, [High], [Low] FROM HDFCBANK
-UNION
-SELECT Symbol, [High], [Low] FROM ONGC
-UNION
-SELECT Symbol, [High], [Low] FROM TCS);
+The SQL code here calculates the volatility of each company's stock prices and compares them.
 
-SELECT * FROM Volatility
+1. **Creating the Volatility View**: 
+    - The code creates a view named `Volatility` using the `CREATE VIEW` statement.
+    - The view is formed by combining the high and low prices of each company's stock (HDFCBANK, ONGC, and TCS) using the `UNION` operator.
+    - The `SELECT` statement selects the `Symbol`, `High`, and `Low` columns from each company's table and combines them into a single view.
 
-SELECT Symbol, ROUND(AVG(High-Low), 2) AS Average_Volatility, DENSE_RANK() OVER(ORDER BY AVG(High-Low)) AS Ranking
-FROM Volatility
-GROUP BY Symbol;
+2. **Calculating Average Volatility and Ranking**:
+    - The code calculates the average volatility for each company by subtracting the low price from the high price and taking the average for each company's stock prices.
+    - The `ROUND` function is used to round the average volatility to two decimal places.
+    - The `DENSE_RANK()` function is applied to rank the companies based on their average volatility in ascending order.
 
-Result - ONGC is the least Volatile and TCS is the most Volatile
-```
+3. **Result**:
+    - After executing the SQL code, the result will display the average volatility for each company, along with their rankings.
+    - Based on the result, it indicates that ONGC has the least volatility, while TCS has the most volatility.
+
 
 ### Q2. Which stock fell the least during the Covid times? (Drawdown)
 
-Drawdown percentage during the COVID-19 period (February 20, 2020, to March 31, 2020) is calculated for each stock.
+Drawdown percentage during the major covid period February 20, 2020, to March 31, 2020 is calculated for each stock.
 
 ```sql
 -- Drawdown Analysis. Eg.,
@@ -164,7 +164,7 @@ Based on the analysis conducted for each metric, a final score is calculated for
 
 ## Final Score Table
 
-The final score table provides an overview of how each stock performs based on the analyzed metrics.
+The final score table provides an overview of how each stock performs based on the analyzed metrics. Please refer to the 'Financial Data Analysis Project.sql' file for further understanding.
 
 This SQL code is creating two tables, `Score_Table` and `Weightage_Table`, and then performing operations to calculate the final score for each symbol based on certain metrics and their corresponding weightages.
 
