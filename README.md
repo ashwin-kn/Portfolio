@@ -25,22 +25,63 @@ The datasets for HDFC Bank, ONGC, and TCS cover the time period from April 1, 20
 
 Before conducting the main analysis, the data undergoes preparation steps, including adding a new date column without the time and finding the month with the highest volume for each stock.
 
-```sql
--- Preparation steps
+### Adding a New Date Column
 
--- Adding a new date column without showing the time, in all the tables. Eg.,
+```sql
+-- Adding a new date column to the HDFCBANK table
 ALTER TABLE PortfolioProject..HDFCBANK
 ADD New_Date nvarchar(400)
+```
 
+This statement adds a new column named "New_Date" to the "HDFCBANK" table in the "PortfolioProject" database. The data type of the new column is set to `nvarchar(400)`, which allows storing variable-length Unicode character data with a maximum length of 400 characters. This column will be used to store dates in string format.
+
+```sql
+-- Updating the New_Date column with formatted dates from the existing Date column
 UPDATE PortfolioProject..HDFCBANK
 SET New_Date = CONVERT(nvarchar(400), [Date], 23)
+```
 
--- Find the month with highest volume for each stock. Eg.,
+This statement updates the values in the "New_Date" column by converting the existing values from the "Date" column to a specific format. Here, the `CONVERT` function is used to convert the "Date" values to `nvarchar` data type with format 23, which represents the "YYYY-MM-DD" format. The converted dates are then stored in the "New_Date" column.
+
+---
+
+This code effectively extends the schema of the "HDFCBANK" table by adding a new column to store date values in a specific format, facilitating further analysis and querying based on dates in the desired format. The same process is followed for the "ONGC" table, and "TCS" table.
+
+
+### Identifying the Month with the Highest Volume
+
+This SQL code segment is designed to identify the month with the highest trading volume for each stock, specifically focusing on the "HDFCBANK" stock in this instance. Here's a breakdown of the code:
+
+```sql
+/*HDFCBANK*/
 SELECT TOP (1) Symbol, Year(New_Date) AS Year, Month(New_Date) AS Month, MAX(Volume) AS Max_Volume
 FROM PortfolioProject..HDFCBANK
 GROUP BY Symbol, Year(New_Date), Month(New_Date)
 ORDER BY MAX(Volume) DESC;
 ```
+
+- **SELECT TOP (1)**: This clause ensures that only the top (or first) record is returned by the query, which corresponds to the month with the highest trading volume.
+
+- **Symbol**: This column represents the stock symbol or identifier.
+
+- **Year(New_Date) AS Year**: It extracts the year component from the "New_Date" column, which likely contains the date information.
+
+- **Month(New_Date) AS Month**: Similarly, it extracts the month component from the "New_Date" column.
+
+- **MAX(Volume) AS Max_Volume**: This calculates the maximum trading volume recorded for each unique combination of symbol, year, and month.
+
+- **FROM PortfolioProject..HDFCBANK**: Specifies the table from which the data is being queried, in this case, the "HDFCBANK" table within the "PortfolioProject" database.
+
+- **GROUP BY Symbol, Year(New_Date), Month(New_Date)**: Groups the data by the stock symbol, year, and month, allowing the calculation of maximum volume within each unique month.
+
+- **ORDER BY MAX(Volume) DESC**: Orders the results by maximum volume in descending order, ensuring that the month with the highest volume appears first.
+
+---
+
+This code segment effectively retrieves information about the month with the highest trading volume for the HDFC Bank stock, providing insights into the stock's performance during periods of high trading activity. The same process is followed for the "ONGC" table, and "TCS" table.
+
+**Further analysis like 50 days moving average and percentage delivery is calculated inorder to further understand the datasets.**
+
 
 ## Main Analysis
 
