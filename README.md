@@ -80,7 +80,8 @@ ORDER BY MAX(Volume) DESC;
 
 This code segment effectively retrieves information about the month with the highest trading volume for the HDFC Bank stock, providing insights into the stock's performance during periods of high trading activity. The same process is followed for the "ONGC" table, and "TCS" table.
 
-**Further analysis like 50 days moving average and percentage delivery is calculated inorder to further understand the datasets.**
+
+***Further analysis like <ins> 50 days moving average </ins> and <ins> percentage delivery </ins> is calculated inorder to further understand the datasets.***
 
 
 ## Main Analysis
@@ -110,22 +111,16 @@ The SQL code here calculates the volatility of each company's stock prices and c
 
 Drawdown percentage during the major covid period February 20, 2020, to March 31, 2020 is calculated for each stock.
 
-```sql
--- Drawdown Analysis. Eg.,
-DECLARE @pre_covid_price_hdfcbank float
-DECLARE @post_covid_price_hdfcbank float
+1. **DECLARE**: This keyword is used to declare variables like `@pre_covid_price_hdfcbank` and `@post_covid_price_hdfcbank` to store the pre-COVID and post-COVID stock prices, respectively.
 
-SET @pre_covid_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK 
-WHERE New_Date = '2020-02-20');
+2. **SET**: These statements assign values to the declared variables. The first `SET` statement retrieves the closing price of the HDFCBANK stock on February 20, 2020 (pre-COVID period), while the second `SET` statement retrieves the closing price on March 31, 2020 (post-COVID period).
 
-SET @post_covid_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK
-WHERE New_Date = '2020-03-31');
+3. **SELECT**: This query calculates the drawdown percentage for the HDFCBANK stock during the COVID-19 period. It subtracts the pre-COVID price from the post-COVID price, divides the result by the pre-COVID price, and then multiplies by 100 to express the drawdown as a percentage.
 
-SELECT ROUND(((-@pre_covid_price_hdfcbank+@post_covid_price_hdfcbank)/@pre_covid_price_hdfcbank), 4) * 100
-  AS hdfcbank_drawdown;
+---
 
---The stock price of HDFC Bank fell by 29.18% during the COVID fall
-```
+The final output of this code snippet provides the drawdown percentage, indicating how much the HDFCBANK stock price declined during the COVID-19 period, offering insights into its performance during this significant market event.
+
 
 ### Q3. How many days did it take for the stock price to rise to its pre-Covid levels? (Recovery Days)
 
