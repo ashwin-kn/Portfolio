@@ -15,7 +15,7 @@
 
 ## Introduction
 
-This project aims to compare and grade different companies based on various financial metrics such as volatility, drawdown percentage, recovery days, strength, and Compound Annual Growth Rate (CAGR). The analysis is performed on three Indian companies: HDFC Bank, Oil and Natural Gas Corporation (ONGC), and Tata Consultancy Services (TCS) of National Stock Exchange (NSE), using historical stock market data obtained from [Kaggle]([url](https://www.kaggle.com/datasets/rohanrao/nifty50-stock-market-data)).
+This project aims to compare and grade different companies based on various financial metrics such as volatility, drawdown percentage, recovery days, strength, and Compound Annual Growth Rate (CAGR). The analysis is performed on three Indian companies: HDFC Bank, Oil and Natural Gas Corporation (ONGC), and Tata Consultancy Services (TCS) of National Stock Exchange (NSE), using historical stock market data obtained from [Kaggle](https://www.kaggle.com/datasets/rohanrao/nifty50-stock-market-data).
 
 ### Data Source
 
@@ -23,7 +23,9 @@ The datasets for HDFC Bank, ONGC, and TCS cover the time period from April 1, 20
 
 ## Preparation of Data
 
-Before conducting the main analysis, the data undergoes preparation steps, including adding a new date column without the time and finding the month with the highest volume for each stock.
+Before conducting the main analysis, the data underwent through some cleaning, preparation and some basic analysis, including adding a new date column without the time and finding the month with the highest volume for each stock.
+
+Note: The database created for this project is called "PortfolioProject", which will be quoted throughout the documentation.
 
 ### Adding a New Date Column
 
@@ -33,7 +35,7 @@ ALTER TABLE PortfolioProject..HDFCBANK
 ADD New_Date nvarchar(400)
 ```
 
-This statement adds a new column named "New_Date" to the "HDFCBANK" table in the "PortfolioProject" database. The data type of the new column is set to `nvarchar(400)`, which allows storing variable-length Unicode character data with a maximum length of 400 characters. This column will be used to store dates in string format.
+This statement adds a new column named "New_Date" to the "HDFCBANK" table in the "PortfolioProject" database. The data type of the new column is set to `nvarchar(400)`, which allows storing variable-length Unicode character data with a maximum length of 400 characters.
 
 ```sql
 -- Updating the New_Date column with formatted dates from the existing Date column
@@ -45,7 +47,7 @@ This statement updates the values in the "New_Date" column by converting the exi
 
 ---
 
-This code effectively extends the schema of the "HDFCBANK" table by adding a new column to store date values in a specific format, facilitating further analysis and querying based on dates in the desired format. The same process is followed for the "ONGC" table, and "TCS" table.
+This code effectively extends the schema of the "HDFCBANK" table by adding a new column to store date values in a specific format, facilitating further analysis and querying based on dates in the desired format. _The same process is followed for the "ONGC" table, and "TCS" table_.
 
 
 ### Identifying the Month with the Highest Volume
@@ -62,14 +64,6 @@ ORDER BY MAX(Volume) DESC;
 
 - **SELECT TOP (1)**: This clause ensures that only the top (or first) record is returned by the query, which corresponds to the month with the highest trading volume.
 
-- **Symbol**: This column represents the stock symbol or identifier.
-
-- **Year(New_Date) AS Year**: It extracts the year component from the "New_Date" column, which likely contains the date information.
-
-- **Month(New_Date) AS Month**: Similarly, it extracts the month component from the "New_Date" column.
-
-- **MAX(Volume) AS Max_Volume**: This calculates the maximum trading volume recorded for each unique combination of symbol, year, and month.
-
 - **FROM PortfolioProject..HDFCBANK**: Specifies the table from which the data is being queried, in this case, the "HDFCBANK" table within the "PortfolioProject" database.
 
 - **GROUP BY Symbol, Year(New_Date), Month(New_Date)**: Groups the data by the stock symbol, year, and month, allowing the calculation of maximum volume within each unique month.
@@ -81,9 +75,8 @@ ORDER BY MAX(Volume) DESC;
 This code segment effectively retrieves information about the month with the highest trading volume for the HDFC Bank stock, providing insights into the stock's performance during periods of high trading activity. The same process is followed for the "ONGC" table, and "TCS" table.
 
 
-***Further analysis like <ins> 50 days moving average </ins> and <ins> percentage delivery </ins> is calculated inorder to further understand the datasets.***
-
-
+***Further analysis like <ins> 50 days moving average </ins> and <ins> percentage delivery </ins> is calculated inorder to further understand the datasets. For that, please go to [Financial Data Analysis Project](Portfolio/Financial Data Analysis Project.sql) file***
+<br>  </br>
 ## Main Analysis
 
 ### Q1. Find the Volatility of all the companies and compare them
