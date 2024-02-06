@@ -85,6 +85,18 @@ Volatility is calculated as the average difference between the daily high and lo
 
 The SQL code here calculates the volatility of each company's stock prices and compares them.
 
+```sql
+CREATE VIEW Volatility AS (SELECT Symbol, [High], [Low] FROM HDFCBANK
+UNION
+SELECT Symbol, [High], [Low] FROM ONGC
+UNION
+SELECT Symbol, [High], [Low] FROM TCS);
+
+SELECT Symbol, ROUND(AVG(High-Low), 2) AS Average_Volatility, DENSE_RANK() OVER(ORDER BY AVG(High-Low)) AS Ranking
+FROM Volatility
+GROUP BY Symbol;
+```
+
 1. **Creating the Volatility View**: 
     - The code creates a view named `Volatility` using the `CREATE VIEW` statement.
     - The view is formed by combining the high and low prices of each company's stock (HDFCBANK, ONGC, and TCS) using the `UNION` operator.
@@ -97,12 +109,26 @@ The SQL code here calculates the volatility of each company's stock prices and c
 
 3. **Result**:
     - After executing the SQL code, the result will display the average volatility for each company, along with their rankings.
-    - Based on the result, it indicates that ONGC has the least volatility, while TCS has the most volatility.
+    - Based on the result, it indicates that ONGC has the least volatility, while TCS has the most volatility during this particular period.
 
 
 ### Q2. Which stock fell the least during the Covid times? (Drawdown)
 
-Drawdown percentage during the major covid period February 20, 2020, to March 31, 2020 is calculated for each stock.
+Drawdown percentage during the major covid period February 20, 2020, to March 31, 2020 is calculated for each stock. Here, the drawdown percentage of HDFCBANK is shown as an example:
+
+```sql
+DECLARE @pre_covid_price_hdfcbank float
+DECLARE @post_covid_price_hdfcbank float
+
+SET @pre_covid_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK 
+WHERE New_Date = '2020-02-20');
+
+SET @post_covid_price_hdfcbank = (SELECT [Close] FROM PortfolioProject..HDFCBANK
+WHERE New_Date = '2020-03-31');
+
+SELECT ROUND(((-@pre_covid_price_hdfcbank+@post_covid_price_hdfcbank)/@pre_covid_price_hdfcbank), 4) * 100
+  AS hdfcbank_drawdown;
+```
 
 1. **DECLARE**: This keyword is used to declare variables like `@pre_covid_price_hdfcbank` and `@post_covid_price_hdfcbank` to store the pre-COVID and post-COVID stock prices, respectively.
 
