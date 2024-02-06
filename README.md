@@ -75,7 +75,7 @@ ORDER BY MAX(Volume) DESC;
 This code segment effectively retrieves information about the month with the highest trading volume for the HDFC Bank stock, providing insights into the stock's performance during periods of high trading activity. The same process is followed for the "ONGC" table, and "TCS" table.
 
 
-***Further analysis like <ins> 50 days moving average </ins> and <ins> percentage delivery </ins> is calculated inorder to further understand the datasets. For that, please go to [Financial Data Analysis Project](Portfolio/Financial Data Analysis Project.sql) file***
+***Further analysis like <ins> 50 days moving average </ins> and <ins> percentage delivery </ins> is calculated inorder to further understand the datasets. For that, please go to [Financial Data Analysis Project](FinancialDataAnalysisProject.sql) file***
 <br>  </br>
 ## Main Analysis
 
