@@ -6,16 +6,16 @@
 - [Preparation of Data](#preparation-of-data)
 - [Main Analysis](#main-analysis)
   - [Volatility Comparison](#q1-find-the-volatility-of-all-the-companies-and-compare-them)
-  - [Drawdown Analysis](#q2-which-stock-fell-the-least-during-the-covid-times-drawdown-time-period---20022020---31032020)
+  - [Drawdown Analysis](#q2-which-stock-fell-the-least-during-the-covid-times-drawdown)
   - [Recovery Days Calculation](#q3-how-many-days-did-it-take-for-the-stock-price-to-rise-to-its-pre-covid-levels-recovery-days)
-  - [Strength Measurement](#q4-number-of-days-the-stock-price-closed-above-its-previous-day-close-price-to-check-the-strength-of-the-stock)
+  - [Strength Measurement](#q4-number-of-days-the-stock-price-closed-above-its-previous-day-close-price-strength)
   - [CAGR Calculation](#q5-cagr-calculation)
 - [Final Score Calculation](#final-score-calculation)
 - [Final Score Table](#final-score-table)
 
 ## Introduction
 
-This project aims to compare and grade different companies based on various financial metrics such as volatility, drawdown percentage, recovery days, strength, and Compound Annual Growth Rate (CAGR). The analysis is performed on three companies: HDFC Bank, Oil and Natural Gas Corporation (ONGC), and Tata Consultancy Services (TCS) using historical stock market data obtained from Kaggle.
+This project aims to compare and grade different companies based on various financial metrics such as volatility, drawdown percentage, recovery days, strength, and Compound Annual Growth Rate (CAGR). The analysis is performed on three Indian companies: HDFC Bank, Oil and Natural Gas Corporation (ONGC), and Tata Consultancy Services (TCS) of National Stock Exchange (NSE), using historical stock market data obtained from [Kaggle]([url](https://www.kaggle.com/datasets/rohanrao/nifty50-stock-market-data)).
 
 ### Data Source
 
