@@ -252,11 +252,39 @@ The comment at the end of the code provides the CAGR of HDFCBANK, which represen
 <br>  </br>
 ## Final Score Calculation
 
-Based on the analysis conducted for each metric, a final score is calculated for each stock, considering predefined weightages for each metric.
+Based on the analysis conducted for each metric, a final score is calculated for each stock, considering predefined weightages for each metric. The SQL code used for the calculation is provided below:
 
-## Final Score Table
+```sql
+CREATE TABLE Score_Table (Symbol varchar(100), [Description] varchar(100), Score int);
 
-The final score table provides an overview of how each stock performs based on the analyzed metrics. Please refer to the [Financial Data Analysis Project](FinancialDataAnalysisProject.sql) file for better understanding of how the final score is ascertained.
+INSERT INTO Score_Table (Symbol,[Description], Score)
+VALUES
+('HDFCBANK', 'Volatility', 2), ('ONGC', 'Volatility', 3), ('TCS', 'Volatility', 1),
+('HDFCBANK', 'Lower_Drawdown', 2), ('ONGC', 'Lower_Drawdown', 1), ('TCS', 'Lower_Drawdown', 3),
+('HDFCBANK', 'Faster_Recovery', 2), ('ONGC', 'Faster_Recovery', 1), ('TCS', 'Faster_Recovery', 3),
+('HDFCBANK', 'Strength', 2), ('ONGC', 'Strength', 1), ('TCS', 'Strength', 3),
+('HDFCBANK', 'CAGR', 2), ('ONGC', 'CAGR', 1), ('TCS', 'CAGR', 3);
+
+CREATE TABLE Weightage_Table ([Description] varchar(100), Weightage decimal(2,2));
+
+INSERT INTO Weightage_Table ([Description] , Weightage)
+VALUES
+('Volatility', 0.2), ('Lower_Drawdown', 0.2), ('Faster_Recovery', 0.2), ('Strength', 0.2), ('CAGR', 0.2);
+
+
+SELECT Symbol, ST.[Description], Score, Weightage
+FROM Score_Table AS ST
+INNER JOIN Weightage_Table AS WT ON ST.[Description] = WT.[Description];
+
+
+/*Calculalting the Final Score*/
+
+SELECT Symbol, SUM (SCORE*WEIGHTAGE) AS Final_Score
+FROM Score_Table AS ST
+INNER JOIN Weightage_Table AS WT ON ST.[Description] = WT.[Description]
+GROUP BY Symbol
+ORDER BY Final_Score DESC;
+```
 
 This SQL code is creating two tables, `Score_Table` and `Weightage_Table`, and then performing operations to calculate the final score for each symbol based on certain metrics and their corresponding weightages.
 
@@ -271,6 +299,19 @@ This SQL code is creating two tables, `Score_Table` and `Weightage_Table`, and t
 5. Then, a SELECT statement is used to join `Score_Table` and `Weightage_Table` on the `Description` column to retrieve the scores and weightages for each symbol and metric.
 
 6. Finally, the final score for each symbol is calculated by multiplying the score for each metric by its corresponding weightage, summing up the products, and grouping the results by symbol. This gives the weighted sum of scores for each symbol, providing an overall assessment of their performance across the metrics. The symbols are ordered in descending order of their final scores.
+
+## Final Score Table
+
+The final score table provides an overview of how each stock performs based on the analyzed metrics. 
+
+| Symbol  | Final Score |
+| ------------- | ------------- |
+| TCS  | 2.60  |
+| HDFCBANK  | 2.00 |
+| ONGC | 1.40 |
+
+
+Please refer to the [Financial Data Analysis Project](FinancialDataAnalysisProject.sql) file for better understanding of how the final score is ascertained.
 <br>  </br>
 # Conclusion
 This readme file provides an overview of the analysis conducted on the stock market data for HDFC Bank, ONGC, and TCS, including the main analysis questions, preparation of data, and the calculation of final scores for each stock.
